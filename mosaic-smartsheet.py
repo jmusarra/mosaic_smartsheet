@@ -55,31 +55,40 @@ def get_sheet(sheet_name):
             sheet = ss_client.Sheets.get_sheet(sheet_id)
             print(f'Found: {sheet.name}')
             print(type(sheet))
-            return sheet
             cols = ss_client.Sheets.get_columns(sheet_id)
-            print(type(cols))
-            print(cols[0])
-    else:
-        print(f'No results found for "{sheet_name}"')
+            column_id = cols.data[0].id
+            print(column_id)
+            a = cols.data[0]
+            print(f'Using column {a.index}, "{a.title}"')
+            c = ss_client.Sheets.get_column(sheet_id, column_id)
+            print(type(c))
 
-def make_csv(sheet_name, dmx_line, zone_number):
+            #print(a.title)
+            #print(type(a))
+            #print(a.id)
+            return sheet
+        else:
+            print(f'No results found for "{sheet_name}"')
+
+def make_csv(layout_name, dmx_line, zone_number):
     print('oh boooyyy csv!')
-    with open(f'{sheet_name}.csv', 'w', newline = '') as csv_file:
-        field_names = ['Name'
-                       'Fixture number'
-                       'Groups'
-                       'Notes'
-                       'Manufacturer ID'
-                       'Model ID'
-                       'Mode ID'
-                       'Width'
-                       'Height'
-                       'X'
-                       'Y'
+    with open(f'{layout_name}.csv', 'w', newline = '') as csv_file:
+        field_names = ['Name',
+                       'Fixture number',
+                       'Groups',
+                       'Notes',
+                       'Manufacturer ID',
+                       'Model ID',
+                       'Mode ID',
+                       'Width',
+                       'Height',
+                       'X',
+                       'Y',
                        'Angle']
-        mosiac_writer = csv.writer(csv_file, dialect = 'excel')
-        mosiac_writer.writerow({'Name': 'XN5.23.05',
-                                'Fixture number' : 1001,
+        mosaic_writer = csv.DictWriter(csv_file, fieldnames = field_names)
+        mosaic_writer.writeheader()
+        mosaic_writer.writerow({'Name': 'XN5.23.05',
+                                'Fixture number' : '',
                                 'Groups': '',
                                 'Notes': 'auto-added!',
                                 'Manufacturer ID': 0,
@@ -90,7 +99,18 @@ def make_csv(sheet_name, dmx_line, zone_number):
                                 'X': 24,
                                 'Y': 24,
                                 'Angle': 0})
-        csv_file.close()
+        mosaic_writer.writerow({'Name': 'XN3.21.01',
+                                'Fixture number' : '',
+                                'Groups': '',
+                                'Notes': 'wheeee',
+                                'Manufacturer ID': 0,
+                                'Model ID': '12',
+                                'Mode ID': '65',
+                                'Width': 24,
+                                'Height': 24,
+                                'X': 48,
+                                'Y': 24,
+                                'Angle': 0})
 
 def extract_zones():
     pass
