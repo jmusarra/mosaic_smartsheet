@@ -12,37 +12,49 @@
 import socket
 import argparse
 
+import urllib
 import smartsheet
 
 parser = argparse.ArgumentParser(
                     prog = 'mosaic-smartsheet',
                     description = 'generate mosaic layout from smartsheet',
                     epilog = 'some text here I guess')
-parser.add_argument('-n-', required = True)
+parser.add_argument('sheet_name', 
+                    help = '''The name of a Smartsheet sheet. Enclose with quotes if
+                            the sheet name contains spaces''')
 
-REMOTE_SERVER = 'https://4wall.com'
+REMOTE_SERVER = '4wall.com'
 
-def check_for_internet():
+def check_for_internet(hostname):
     '''
     see if we have a working internet connection
     copied from https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
     '''
     try:
         host = socket.gethostbyname(hostname)
-        s = socket.create_connection(host, 80), 2
+        s = socket.create_connection((host, 443), 2)
         s.close()
         return True 
     except Exception:
         pass
     return False
 
-def pull_from_smartsheet():
+def get_sheet(sheet):
+    print(f'Sheet to get: {sheet}')
 
+def make_csv(dmx_line, zone_number):
     pass
 
 def extract_zones():
     pass
 
-
 if __name__ == '__main__':
-    parser.parse_args()
+    arguments = parser.parse_args()
+    sheet = arguments.sheet_name
+    print(sheet)
+    type(arguments)
+    if check_for_internet(REMOTE_SERVER):
+        print("looks like we have internet. Let's continue.")
+    else:
+        sys.exit('No internet connection found. Exiting. (try again later?)')
+    get_sheet(sheet)
