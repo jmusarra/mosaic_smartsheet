@@ -11,8 +11,9 @@
 '''
 import socket
 import argparse
+import csv
 
-import urllib
+# import urllib
 import smartsheet
 
 parser = argparse.ArgumentParser(
@@ -51,19 +52,54 @@ def get_sheet(sheet_name):
             sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
             ss_client.Sheets.get_sheet(sheet_id)
             print(f'Sheet ID is {sheet_id}')
-            result = ss_client.Sheets.get_sheet(sheet_id)
-            print(f'Found: {result.name}')
+            sheet = ss_client.Sheets.get_sheet(sheet_id)
+            print(f'Found: {sheet.name}')
+            print(type(sheet))
+            return sheet
+            cols = ss_client.Sheets.get_columns(sheet_id)
+            print(type(cols))
+            print(cols[0])
     else:
         print(f'No results found for "{sheet_name}"')
 
-
-def make_csv(dmx_line, zone_number):
-    pass
+def make_csv(sheet_name, dmx_line, zone_number):
+    print('oh boooyyy csv!')
+    with open(f'{sheet_name}.csv', 'w', newline = '') as csv_file:
+        field_names = ['Name'
+                       'Fixture number'
+                       'Groups'
+                       'Notes'
+                       'Manufacturer ID'
+                       'Model ID'
+                       'Mode ID'
+                       'Width'
+                       'Height'
+                       'X'
+                       'Y'
+                       'Angle']
+        mosiac_writer = csv.writer(csv_file, dialect = 'excel')
+        mosiac_writer.writerow({'Name': 'XN5.23.05',
+                                'Fixture number' : 1001,
+                                'Groups': '',
+                                'Notes': 'auto-added!',
+                                'Manufacturer ID': 0,
+                                'Model ID': '12',
+                                'Mode ID': '65',
+                                'Width': 24,
+                                'Height': 24,
+                                'X': 24,
+                                'Y': 24,
+                                'Angle': 0})
+        csv_file.close()
 
 def extract_zones():
     pass
 
 if __name__ == '__main__':
+    '''
+    takes one argument, which must be the full name of the sheet.
+    If name contains spaces, enclose the name in quotes
+    '''
     arguments = parser.parse_args()
     sheet_name = arguments.sheet_name
     print(sheet_name)
@@ -73,3 +109,4 @@ if __name__ == '__main__':
     else:
         sys.exit('No internet connection found. Exiting. (try again later?)')
     get_sheet(sheet_name)
+    make_csv(sheet_name, 'X5.01.01', 'z912b')
