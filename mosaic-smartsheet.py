@@ -43,10 +43,19 @@ def get_sheet(sheet_name):
     ss_client = smartsheet.Smartsheet()
     ss_client.errors_as_exceptions(True)
     print(f'Sheet to get: {sheet_name}')
-    search_results = ss_client.Search.search(sheet_name).results
-    sheet_id = next(result.object_id for result in search_results if result.object_type == 'sheet')
-    ss_client.Sheets.get_sheet(sheet_id)
-    print(f'Sheet ID is {sheet_id}')
+    search_result = ss_client.Search.search(sheet_name, scopes = 'sheetNames').results
+    #print(type(search_result))
+    print(f'found {len(search_result)} results.')
+    for r in range(len(search_result)):
+        if (search_result[r].text) == sheet_name:
+            sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
+            ss_client.Sheets.get_sheet(sheet_id)
+            print(f'Sheet ID is {sheet_id}')
+            result = ss_client.Sheets.get_sheet(sheet_id)
+            print(f'Found: {result.name}')
+    else:
+        print(f'No results found for "{sheet_name}"')
+
 
 def make_csv(dmx_line, zone_number):
     pass
