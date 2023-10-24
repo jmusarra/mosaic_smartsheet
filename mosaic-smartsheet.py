@@ -14,7 +14,11 @@ import argparse
 
 import smartsheet
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+                    prog = 'mosaic-smartsheet',
+                    description = 'generate mosaic layout from smartsheet',
+                    epilog = 'some text here I guess')
+parser.add_argument('-n-', required = True)
 
 REMOTE_SERVER = 'https://4wall.com'
 
