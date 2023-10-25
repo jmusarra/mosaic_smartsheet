@@ -9,6 +9,13 @@
 
    take sheet_title as argument
 '''
+
+__author__ = "John Musarra"
+__license__ = "MIT"
+__email__ = "john@mightymu.net"
+__maintainer__ = "John Musarra"
+__version__ = "alpha"
+
 import socket
 import argparse
 import csv
@@ -119,6 +126,7 @@ def create_fixture_rows(fixture_names):
     fixture_rows = []
     for f in fixture_names:
         #build a list of lists, with the items from make_fixture_names as the first elements
+        #TODO: groups!
             fixture_row = [f,            #fixture name
                            '',           #fixture number - leave blank 
                            '',           #groups
@@ -172,4 +180,3 @@ if __name__ == '__main__':
         get_sheet(sheet_name)
     else:
         sys.exit('No internet connection found. Exiting. (try again later?)')
-# make_csv(sheet_name, 'X5.01.01', 'z912b') # this is the way
