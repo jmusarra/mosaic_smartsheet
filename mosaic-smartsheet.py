@@ -16,6 +16,7 @@ import logging
 
 # import urllib
 import smartsheet
+import fixture_types
 
 REMOTE_SERVER = '4wall.com'
 testing_sheet_id = 8769876857776004
@@ -61,27 +62,37 @@ def get_sheet(sheet_name):
             column_id = cols.data[0].id
             # delete print(type(sheet))
             print(column_id)
-            column_to_dict(sheet, sheet_id, column_id)
+            make_fixture_names(sheet, sheet_id, column_id)
 
         else:
             print(f'No results found for "{sheet_name}". Did you use the exact name, and put it in quotes?')
 
 
-def column_to_dict(sheet, sheet_id, column_id):
+def make_fixture_names(sheet, sheet_id, column_id):
     '''
     takes sheet_id and column_id, combines the DMX Line ID and zone number into a
     single string, and returns that string, for use as a fixture_name with make_csv()'''
     print(f'column_to_dict time. Using sheet ID {sheet_id} and column_id {column_id}.')
-    parent_rows = []
+    fixture_names = []
+    #zones = []
     for row in sheet.rows:
         if row.parent_id is None:
             parent_row = row.id
-            print(row.id)
             for cell in row.cells:
                 if cell.column_id == column_id:
                     if cell.value is not None:
-                        parent_rows.append(cell.value)
-    print(parent_rows)
+                        cable_id = cell.value
+        if row.parent_id is not None:
+            for cell in row.cells:
+                if cell.value is not None:
+                    if cell.column_id == column_id:
+                        zones.append(cell.value)
+                        fixture_name = cable_id + ' - ' + cell.value
+                        fixture_names.append(fixture_name)
+    #print(f'Cable ID {cable_id} has {len(zones)} zones.')
+    return(fixture_names)
+
+def create_layout:
     pass
 
 def make_csv(layout_name, fixture_name):

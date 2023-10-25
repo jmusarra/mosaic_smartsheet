@@ -1,0 +1,1 @@
+print('TODO: we need a table of fixture types (LED RGBW 16bit) to "Model IDs" (12)')
