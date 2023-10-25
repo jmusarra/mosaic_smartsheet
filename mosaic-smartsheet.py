@@ -12,9 +12,14 @@
 import socket
 import argparse
 import csv
+import logging
 
 # import urllib
 import smartsheet
+
+REMOTE_SERVER = '4wall.com'
+
+logging.basicConfig(filename = 'mosaic-smartsheet.log', level=logging.INFO)
 
 parser = argparse.ArgumentParser(
                     prog = 'mosaic-smartsheet',
@@ -23,8 +28,6 @@ parser = argparse.ArgumentParser(
 parser.add_argument('sheet_name', 
                     help = '''The name of a Smartsheet sheet. Enclose with quotes if
                             the sheet name contains spaces''')
-
-REMOTE_SERVER = '4wall.com'
 
 def check_for_internet(hostname):
     '''
@@ -45,33 +48,27 @@ def get_sheet(sheet_name):
     ss_client.errors_as_exceptions(True)
     print(f'Sheet to get: {sheet_name}')
     search_result = ss_client.Search.search(sheet_name, scopes = 'sheetNames').results
-    #print(type(search_result))
     print(f'found {len(search_result)} results.')
     for r in range(len(search_result)):
         if (search_result[r].text) == sheet_name:
             sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
-            ss_client.Sheets.get_sheet(sheet_id)
-            print(f'Sheet ID is {sheet_id}')
+            # redundant? ss_client.Sheets.get_sheet(sheet_id)
             sheet = ss_client.Sheets.get_sheet(sheet_id)
-            print(f'Found: {sheet.name}')
-            print(type(sheet))
-            cols = ss_client.Sheets.get_columns(sheet_id)
-            column_id = cols.data[0].id
-            print(column_id)
-            a = cols.data[0]
-            print(f'Using column {a.index}, "{a.title}"')
-            c = ss_client.Sheets.get_column(sheet_id, column_id)
-            print(type(c))
-
-            #print(a.title)
-            #print(type(a))
-            #print(a.id)
-            return sheet
+            print(f'Found: {sheet.name}. ID is {sheet_id}')
+            # delete print(type(sheet))
+            return sheet_id            
         else:
-            print(f'No results found for "{sheet_name}"')
+            print(f'No results found for "{sheet_name}". Did you use the exact name, and put it in quotes?')
 
-def make_csv(layout_name, dmx_line, zone_number):
-    print('oh boooyyy csv!')
+
+def column_to_dict(sheet_id, column_id):
+    '''
+    takes sheet_id and column_id, combines the DMX Line ID and zone number into a
+    single string, and returns that string, for use as a fixture_name with make_csv()'''
+    print(f'column_to_dict time. Using sheet ID {sheet_id} and column_id {column_id}.')
+    pass
+
+def make_csv(layout_name, fixture_name):
     with open(f'{layout_name}.csv', 'w', newline = '') as csv_file:
         field_names = ['Name',
                        'Fixture number',
@@ -126,7 +123,8 @@ if __name__ == '__main__':
     type(arguments)
     if check_for_internet(REMOTE_SERVER):
         print("looks like we have internet. Let's continue.")
+        get_sheet(sheet_name)
     else:
         sys.exit('No internet connection found. Exiting. (try again later?)')
-    get_sheet(sheet_name)
-    make_csv(sheet_name, 'X5.01.01', 'z912b')
+    
+    # make_csv(sheet_name, 'X5.01.01', 'z912b') # this is the way
