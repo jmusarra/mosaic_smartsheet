@@ -18,6 +18,8 @@ import logging
 import smartsheet
 
 REMOTE_SERVER = '4wall.com'
+testing_sheet_id = 8769876857776004
+testing_column_id = 1182995975038852
 
 logging.basicConfig(filename = 'mosaic-smartsheet.log', level=logging.INFO)
 
@@ -55,17 +57,31 @@ def get_sheet(sheet_name):
             # redundant? ss_client.Sheets.get_sheet(sheet_id)
             sheet = ss_client.Sheets.get_sheet(sheet_id)
             print(f'Found: {sheet.name}. ID is {sheet_id}')
+            cols = ss_client.Sheets.get_columns(sheet_id)
+            column_id = cols.data[0].id
             # delete print(type(sheet))
-            return sheet_id            
+            print(column_id)
+            column_to_dict(sheet, sheet_id, column_id)
+
         else:
             print(f'No results found for "{sheet_name}". Did you use the exact name, and put it in quotes?')
 
 
-def column_to_dict(sheet_id, column_id):
+def column_to_dict(sheet, sheet_id, column_id):
     '''
     takes sheet_id and column_id, combines the DMX Line ID and zone number into a
     single string, and returns that string, for use as a fixture_name with make_csv()'''
     print(f'column_to_dict time. Using sheet ID {sheet_id} and column_id {column_id}.')
+    parent_rows = []
+    for row in sheet.rows:
+        if row.parent_id is None:
+            parent_row = row.id
+            print(row.id)
+            for cell in row.cells:
+                if cell.column_id == column_id:
+                    if cell.value is not None:
+                        parent_rows.append(cell.value)
+    print(parent_rows)
     pass
 
 def make_csv(layout_name, fixture_name):
