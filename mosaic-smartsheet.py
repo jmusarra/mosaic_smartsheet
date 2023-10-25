@@ -1,5 +1,9 @@
 '''Uses Smartsheet's API to pull a sheet. Then extracts the zone numbers, then
    uses the exported csv --or modifies in-place??-- the mosaic designer layout.
+   
+   Takes one argument, which must be the full name of the sheet.
+   
+   If name contains spaces, enclose the name in quotes
 
    Create .csv directly from smartsheet, and then import?
 
@@ -44,7 +48,8 @@ parser.add_argument('title',
 def check_for_internet(hostname):
     '''
     see if we have a working internet connection
-    copied from https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
+    copied from 
+    https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
     '''
     try:
         host = socket.gethostbyname(hostname)
@@ -81,7 +86,8 @@ def get_sheet(sheet_name):
             make_fixture_names(sheet, sheet_id, column_id)
 
         else:
-            print(f'No results found for "{sheet_name}". Did you use the exact name, and put it in quotes?')
+            print(f'''No results found for "{sheet_name}".
+                   Did you use the exact name, and put it in quotes?''')
 
 
 def make_fixture_names(sheet, sheet_id, column_id):
@@ -118,28 +124,28 @@ def create_fixture_rows(fixture_names):
     expected information to create a full row.
     Expected columns:
     '''
-    default_fixture_number = ''                  
-    default_fixture_width: 24
-    default_fixture_height: 24
+    default_fixture_number = ''
+    default_fixture_width = 24
+    default_fixture_height = 24
     default_angle = 0
     print('Creating Mosaic layout!')
     fixture_rows = []
     for f in fixture_names:
         #build a list of lists, with the items from make_fixture_names as the first elements
         #TODO: groups!
-            fixture_row = [f,            #fixture name
-                           '',           #fixture number - leave blank 
-                           '',           #groups
-                           '',           #notes
-                           0,            #manufacturer id
-                           12,           #model id
-                           65,           #mode ID
-                           24,           #width
-                           24,           #height
-                           24,           #x
-                           24,           #y
-                           0]            #angle
-            fixture_rows.append(fixture_row)
+        fixture_row = [f,            #fixture name
+                       '',           #fixture number - leave blank 
+                       '',           #groups
+                       '',           #notes
+                       0,            #manufacturer id
+                       12,           #model id
+                       65,           #mode ID
+                       24,           #width
+                       24,           #height
+                       24,           #x
+                       24,           #y
+                       0]            #angle
+        fixture_rows.append(fixture_row)
     print(f'Created {len(fixture_rows)} fixture rows.')
     make_csv(fixture_rows)
 
@@ -165,12 +171,8 @@ def make_csv(fixture_rows):
         mosaic_writer.writerow(header)
         for row in fixture_rows:
             mosaic_writer.writerow(row)
-      
+
 if __name__ == '__main__':
-    '''
-    takes one argument, which must be the full name of the sheet.
-    If name contains spaces, enclose the name in quotes
-    '''
     arguments = parser.parse_args()
     sheet_name = arguments.title
     print(sheet_name)
