@@ -1,18 +1,19 @@
-'''Uses Smartsheet's API to pull a sheet. Then extracts the zone numbers, then
-   uses the exported csv --or modifies in-place??-- the mosaic designer layout.
+"""
+Uses Smartsheet's API to pull a sheet. Then extracts the zone numbers, then
+uses the exported csv --or modifies in-place??-- the mosaic designer layout.
    
-   Takes one argument, which must be the full name of the sheet.
+Takes one argument, which must be the full name of the sheet.
    
-   If name contains spaces, enclose the name in quotes
+If name contains spaces, enclose the name in quotes
 
-   Create .csv directly from smartsheet, and then import?
+Create .csv directly from smartsheet, and then import?
 
-   this could be a web app.
+this could be a web app.
 
-   TODO: use OAuth2 for access/authentication
+TODO: use OAuth2 for access/authentication
 
-   take sheet_title as argument
-'''
+take sheet_title as argument
+"""
 
 __author__ = "John Musarra"
 __license__ = "MIT"
@@ -63,11 +64,13 @@ def check_for_internet(hostname):
     return False
 
 def get_sheet(sheet_name):
-    '''
-    queries the Smartsheet API. Searches for the string provided as the argument
-    to mosaic-smarthseet.py. Uses that to get us a sheet_id, then takes the first
+    """
+    Gets the relevant info from the specified Smartsheet.
+
+    Queries the Smartsheet API and searches for the string provided as the argument
+    to mosaic-smartsheet.py. Uses that to get us a sheet_id, then takes the first
     column as our Cable ID / zone information.
-    '''
+    """
     ss_client = smartsheet.Smartsheet()
     ss_client.errors_as_exceptions(True)
     print(f'Sheet to get: {sheet_name}')
@@ -76,25 +79,24 @@ def get_sheet(sheet_name):
     for r in range(len(search_result)):
         if (search_result[r].text) == sheet_name:
             sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
-            # redundant? ss_client.Sheets.get_sheet(sheet_id)
             sheet = ss_client.Sheets.get_sheet(sheet_id)
             print(f'Found: {sheet.name}. ID is {sheet_id}')
             cols = ss_client.Sheets.get_columns(sheet_id)
             column_id = cols.data[0].id
-            # delete print(type(sheet))
-            #print(column_id)
             make_fixture_names(sheet, sheet_id, column_id)
-
         else:
             print(f'''No results found for "{sheet_name}".
                    Did you use the exact name, and put it in quotes?''')
 
 
 def make_fixture_names(sheet, sheet_id, column_id):
+    """
+    Gets cable ID and zone, combines them into a fixture name.
+
+    Takes sheet_id and column_id, combines the Cable ID and zone number into a
+    single string, and returns that string, for use as a fixture_name with create_layout()
+    """
     #TODO: test the shit out of this
-    '''
-    takes sheet_id and column_id, combines the DMX Line ID and zone number into a
-    single string, and returns that string, for use as a fixture_name with create_layout()'''
     print(f'Getting fixture names. Using sheet ID {sheet_id} and column_id {column_id}.')
     fixture_names = []
     id_count = 0
@@ -119,11 +121,12 @@ def make_fixture_names(sheet, sheet_id, column_id):
     create_fixture_rows(fixture_names)
 
 def create_fixture_rows(fixture_names):
-    '''
-    takes the list of fixture names from Smartsheet, then adds the rest of the
-    expected information to create a full row.
-    Expected columns:
-    '''
+    """
+    Creates the rows of fixture information to be CSV'ified.
+
+    Takes the list of fixture names from Smartsheet, then adds the rest of the
+    columns that Mosaic expects to create a full row.
+    """
     default_fixture_number = ''
     default_fixture_width = 24
     default_fixture_height = 24
@@ -131,7 +134,6 @@ def create_fixture_rows(fixture_names):
     print('Creating Mosaic layout!')
     fixture_rows = []
     for f in fixture_names:
-        #build a list of lists, with the items from make_fixture_names as the first elements
         #TODO: groups!
         fixture_row = [f,            #fixture name
                        '',           #fixture number - leave blank 
@@ -150,9 +152,8 @@ def create_fixture_rows(fixture_names):
     make_csv(fixture_rows)
 
 def make_csv(fixture_rows):
-    '''
-    docstring
-    '''
+    """Writes the generated rows to an excel-formatted CSV file"""
+
     layout_name = sheet_name
     with open(f'{layout_name}.csv', 'w', newline = '', encoding='cp1252') as csv_file:
         header = ['Name',
