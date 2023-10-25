@@ -99,11 +99,9 @@ def make_fixture_names(sheet, sheet_id, column_id):
                 if cell.value is not None:
                     #row is a child / zone number
                     if cell.column_id == column_id:
-                        #zones.append(cell.value)
                         fixture_count += 1
                         fixture_name = cable_id + ' - ' + cell.value
                         fixture_names.append(fixture_name)
-    #print(f'Cable ID {cable_id} has {len(zones)} zones.')
     print(f'Created {len(fixture_names)} fixtures on {id_count} cable IDs.')
     create_fixture_rows(fixture_names)
 
@@ -134,11 +132,8 @@ def create_fixture_rows(fixture_names):
                            24,           #y
                            0]            #angle
             fixture_rows.append(fixture_row)
-    print(fixture_rows[0])
-    print(fixture_rows[23])
-    print(fixture_rows[202])
-    #return a list of lists:
-      #['fixture name', '', '', '', '', '0', 12, 65, 24, 24,]
+    print(f'Created {len(fixture_rows)} fixture rows.')
+    make_csv(fixture_rows)
 
 def make_csv(fixture_rows):
     '''
@@ -160,20 +155,8 @@ def make_csv(fixture_rows):
                   'Angle']
         mosaic_writer = csv.writer(csv_file, dialect = 'excel')
         mosaic_writer.writerow(header)
-        for f in fixtures:
-            fixture_row = [f,   #fixture name
-                           '',           #fixture number - leave blank 
-                           '',           #groups
-                           '',           #notes
-                           0,            #manufacturer id
-                           12,           #model id
-                           65,           #mode ID
-                           24,           #width
-                           24,           #height
-                           24,           #x
-                           24,           #y
-                           0]            #angle
-            mosaic_writer.writerow(fixture_row)
+        for row in fixture_rows:
+            mosaic_writer.writerow(row)
       
 if __name__ == '__main__':
     '''
