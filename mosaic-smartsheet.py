@@ -26,7 +26,7 @@ import argparse
 import csv
 import logging
 import sys
-from collections import Counter
+from pprint import pprint
 
 # import urllib
 import smartsheet
@@ -112,23 +112,22 @@ def make_fixture_names(sheet, sheet_id, column_id):
                 if cell.column_id == column_id:
                     if cell.value is not None:
                         parent_ids.append(row.id)
-                        #print(f'Row ID: {row.id}, count: {len(parent_ids)}')
                         id_count += 1
                         cable_id = cell.value
                         if cable_id not in cable_ids:
                             cable_ids.append(cable_id)
                             fixture_groups[cable_id] = []
                         for id in parent_ids:
-                            print(f'parent ID: {id}')
+                            #print(f'parent ID: {id}')
                             for row in sheet.rows:
                                 if row.parent_id == id:
                                     for cell in row.cells:
                                         if cell.column_id == column_id:
                                             if cell.value is not None:
-                                                print(cell.value)
+                                                #print(cell.value)
                                                 zone_list.append(cell.value)
                                                 fixture_groups[cable_id] = zone_list
-                        zone_list = []
+                            zone_list = []
     '''                            
             zone_list = []
             if row.parent_id in parent_ids:
@@ -146,7 +145,7 @@ def make_fixture_names(sheet, sheet_id, column_id):
     '''   
     print(f'Got {len(zone_list)} fixtures')
     print(f'Created {len(fixture_names)} fixtures on {id_count} cable IDs.')
-    print(fixture_groups['X6.01.01'])
+    pprint(fixture_groups)
 
    # make_groups(fixture_names, cable_ids)
 
