@@ -101,6 +101,7 @@ def make_fixture_names(sheet, sheet_id, column_id):
     fixture_names = []
     id_count = 0
     fixture_count = 0
+    cable_ids = []
     for row in sheet.rows:
         if row.parent_id is None:
             #row is a parent / cable ID
@@ -109,6 +110,8 @@ def make_fixture_names(sheet, sheet_id, column_id):
                     if cell.value is not None:
                         id_count += 1
                         cable_id = cell.value
+                        if cable_id not in cable_ids:
+                            cable_ids.append(cable_id)
         if row.parent_id is not None:
             for cell in row.cells:
                 if cell.value is not None:
@@ -118,9 +121,10 @@ def make_fixture_names(sheet, sheet_id, column_id):
                         fixture_name = cable_id + ' - ' + cell.value
                         fixture_names.append(fixture_name)
     print(f'Created {len(fixture_names)} fixtures on {id_count} cable IDs.')
-    create_fixture_rows(fixture_names)
+    print(cable_ids)
+    create_fixture_rows(fixture_names, cable_ids)
 
-def create_fixture_rows(fixture_names):
+def create_fixture_rows(fixture_names, groups):
     """
     Creates the rows of fixture information to be CSV'ified.
 
@@ -134,10 +138,12 @@ def create_fixture_rows(fixture_names):
     print('Creating Mosaic layout!')
     fixture_rows = []
     for f in fixture_names:
+        group = f.split(' ')[0]
+        print(group)
         #TODO: groups!
         fixture_row = [f,            #fixture name
                        '',           #fixture number - leave blank 
-                       '',           #groups
+                       group,        #groups
                        '',           #notes
                        0,            #manufacturer id
                        12,           #model id
