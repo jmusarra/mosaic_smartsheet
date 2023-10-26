@@ -26,7 +26,6 @@ import argparse
 import csv
 import logging
 import sys
-from pprint import pprint
 
 # import urllib
 import smartsheet
@@ -132,16 +131,6 @@ def make_fixture_names(sheet, sheet_id, column_id):
     #pprint(fixture_groups)
     create_fixture_rows(fixture_groups)
 
-def make_groups(groups):
-    """
-    returns group_name and num_fixtures
-    """
-    group_names = []
-    for num, name in list(enumerate(cable_ids, start = 1)):
-       pass 
-    groups = (1, 5)
-    return groups
-
 def create_fixture_rows(groups):
     """
     Creates the rows of fixture information to be CSV'ified.
@@ -149,7 +138,6 @@ def create_fixture_rows(groups):
     Takes the list of fixture names from Smartsheet, then adds the rest of the
     columns that Mosaic expects to create a full row.
     """
-    
     default_fixture_number = ''
     default_fixture_width = 24
     default_fixture_height = 24
@@ -160,7 +148,6 @@ def create_fixture_rows(groups):
     fixture_rows = []
     x = start_x
     y = start_y
-    
     fixture_names = []
     # build all fixture names:
     for cable_id, zone in groups.items():
@@ -195,7 +182,7 @@ def create_fixture_rows(groups):
         fixture_rows.append(fixture_row)
     print(f'Created {len(fixture_rows)} fixture rows.')
     make_csv(fixture_rows)
-   
+
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
 
