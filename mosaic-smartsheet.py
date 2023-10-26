@@ -105,6 +105,7 @@ def make_fixture_names(sheet, sheet_id, column_id):
     cable_ids = []
     parent_ids = []
     zone_list = []
+    #TODO: unfuck this:
     for row in sheet.rows:
         if row.parent_id is None:
             #row is a parent / cable ID
@@ -117,76 +118,38 @@ def make_fixture_names(sheet, sheet_id, column_id):
                         if cable_id not in cable_ids:
                             cable_ids.append(cable_id)
                             fixture_groups[cable_id] = []
-                        for id in parent_ids:
-                            #print(f'parent ID: {id}')
+                        for p_id in parent_ids:
                             for row in sheet.rows:
-                                if row.parent_id == id:
+                                if row.parent_id == p_id:
                                     for cell in row.cells:
                                         if cell.column_id == column_id:
                                             if cell.value is not None:
-                                                #print(cell.value)
                                                 zone_list.append(cell.value)
                                                 fixture_groups[cable_id] = zone_list
-                            zone_list = []
-    '''                            
-            zone_list = []
-            if row.parent_id in parent_ids:
-                print(row.parent_id)
-                for cell in row.cells:
-                    if cell.value is not None:
-                        #row is a child / zone number
-                        if cell.column_id == column_id:
-                            fixture_name = cable_id + ' - ' + cell.value
-                            fixture_names.append(fixture_name)
-                            zone_list.append(cell.value)
-                        #for key, value in fixture_groups.items():
-                         #   print(key, value)
-                    fixture_groups[cable_id] = zone_list
-    '''   
+                            zone_list = [] # reset the list of zone munbers to empty
     print(f'Got {len(zone_list)} fixtures')
-    print(f'Created {len(fixture_names)} fixtures on {id_count} cable IDs.')
-    pprint(fixture_groups)
+    print(f'Created {len(fixture_names)} fixtures on {id_count} DMX lines.')
+    #pprint(fixture_groups)
+    create_fixture_rows(fixture_groups)
 
-   # make_groups(fixture_names, cable_ids)
-
-def make_groups(fixture_names, cable_ids):
+def make_groups(groups):
     """
     returns group_name and num_fixtures
     """
-   # def count_fixtures(fixture_names, cable_ids):
-    count = 0
-    freq = {}
-    '''for f in fixture_names:
-            #if f.split(" ")[0] is in cable_ids:
-                freq[f] += 1
-               print(freq[x])
-    '''
-
     group_names = []
     for num, name in list(enumerate(cable_ids, start = 1)):
-        group_name = f"{{{num},'{name}'}}"
-        group_names.append(group_name)
-    print(group_names[-1])
-    #count_fixtures(fixture_names, group_names)
-
-    for f in fixture_names:
-        num_fixtures = 0
-
-
-
-    num_fixtures = 'placeholder'
+       pass 
     groups = (1, 5)
     return groups
-    # groups = ("1 - XN6.02.01", 15)
-    # num_rows = name
 
-def create_fixture_rows(fixture_names, groups):
+def create_fixture_rows(groups):
     """
     Creates the rows of fixture information to be CSV'ified.
 
     Takes the list of fixture names from Smartsheet, then adds the rest of the
     columns that Mosaic expects to create a full row.
     """
+    
     default_fixture_number = ''
     default_fixture_width = 24
     default_fixture_height = 24
@@ -197,32 +160,42 @@ def create_fixture_rows(fixture_names, groups):
     fixture_rows = []
     x = start_x
     y = start_y
+    
+    fixture_names = []
+    # build all fixture names:
+    for cable_id, zone in groups.items():
+        #print(f'{cable_id}: {len(zone)} fixtures')
+        for z in zone:
+            fixture_names.append(f'{cable_id} - {z}')
+    print(f'Created {len(fixture_names)} fixture names')
+
+    # build all group_names
+    group_names = []
+    for num, name in enumerate(fixture_names, start = 1):
+        group_names.append(f"{{{num},'{name}'}}")
+    print(group_names[1])
+
     for f in fixture_names:
-        #group = f"""1,'{{{f.split(" ")[0]}}}'"""
-        group_number = ''
-        group_name  = "sample group name"
-        group = f"{{{group_number},'{group_name}'}}"
+        fixture_row = [f,        #fixture name
+                   '',           #fixture number - leave blank 
+                   g,            #groups
+                   '',           #notes
+                   0,            #manufacturer id
+                   12,           #model id
+                   65,           #mode ID
+                   24,           #width
+                   24,           #height
+                   x,            #x
+                   y,            #y
+                   0]            #angle
         x += default_fixture_width
         if x >= 481: #20 fixtures wide
             y += default_fixture_height
             x = start_x
-        #TODO: groups!
-        fixture_row = [f,            #fixture name
-                       '',           #fixture number - leave blank 
-                       group,        #groups
-                       '',           #notes
-                       0,            #manufacturer id
-                       12,           #model id
-                       65,           #mode ID
-                       24,           #width
-                       24,           #height
-                       x,           #x
-                       y,           #y
-                       0]            #angle
         fixture_rows.append(fixture_row)
     print(f'Created {len(fixture_rows)} fixture rows.')
     make_csv(fixture_rows)
-
+   
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
 
