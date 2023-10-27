@@ -218,10 +218,14 @@ def fucking_around(groups):
         fixtures_per_line = (cable_id, len(zone))
         print(f'Creating {len(zone)} lil squareys for {cable_id}...')
         for i in range(len(zone)):
-            make_fixtures_for_group(i)
+            make_fixtures_for_group(i + 1)
 
 def make_fixtures_for_group(index):
-    print(f'Squarey {index + 1}!')
+    position = [24 * index, 24]
+    if position[0] >= 481:
+        position[1] = position[1] + 24
+    print(f'Squarey {index} at {position[0]},{position[1]}')
+
 
 
 if __name__ == '__main__':
