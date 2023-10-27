@@ -122,7 +122,7 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
     num_lines = len(fixture_groups.keys())    
     print(f'Found {num_fixtures} fixtures on {num_lines} DMX lines.')
     create_fixture_rows(fixture_groups)
-    fucking_around(fixture_groups)
+    make_fixtures_for_group(fixture_groups)
 
 def create_fixture_rows(groups):
     """
@@ -177,6 +177,46 @@ def create_fixture_rows(groups):
         fixture_rows.append(fixture_row)
     print(f'Created {len(fixture_rows)} fixture rows.')
     make_csv(fixture_rows)
+    #fucking_around(fixture_rows)
+
+
+
+def fucking_around(groups):
+    #create_zones(groups):
+    """
+    Well I seem to have adopted the habit of building docstrings
+    """
+    # print(groups)
+    # build the thing
+    # for g in groups.values():
+        # Build group label:
+        #blah(group_name, num_fixtures)
+
+    for num, cable_id in enumerate(groups, start = 1):
+        group_name = f"{{{num},'{cable_id}'}}"
+        print(group_name)
+    for cable_id, zone in groups.items():
+        fixtures_per_line = (cable_id, len(zone))
+        print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        for i in range(len(zone)):
+            make_fixtures_for_group(i + 1, fixture_rows)
+
+def make_fixtures_for_group(groups):
+    fixture_rows = []
+    row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
+    for cable_id, zone in groups.items():
+        fixtures_per_line = (cable_id, len(zone))
+        print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        for i in range(len(zone)):
+            #print(fixture_names[0])
+            position = [24 * i+1, 24]
+            if position[0] >= 481:
+                position[1] += 24
+            print(f'Squarey {i + 1} at {position[0]},{position[1]}')
+            row[9] = position[0]
+            row[10] = position[1]
+            fixture_rows.append(row)
+        print(fixture_rows[-1])
 
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
@@ -199,33 +239,6 @@ def make_csv(fixture_rows):
         mosaic_writer.writerow(header)
         for row in fixture_rows:
             mosaic_writer.writerow(row)
-
-def fucking_around(groups):
-    #create_zones(groups):
-    """
-    Well I seem to have adopted the habit of building docstrings
-    """
-    # print(groups)
-    # build the thing
-    # for g in groups.values():
-        # Build group label:
-        #blah(group_name, num_fixtures)
-
-    for num, cable_id in enumerate(groups, start = 1):
-        group_name = f"{{{num},'{cable_id}'}}"
-        print(group_name)
-    for cable_id, zone in groups.items():
-        fixtures_per_line = (cable_id, len(zone))
-        print(f'Creating {len(zone)} lil squareys for {cable_id}...')
-        for i in range(len(zone)):
-            make_fixtures_for_group(i + 1)
-
-def make_fixtures_for_group(index):
-    position = [24 * index, 24]
-    if position[0] >= 481:
-        position[1] = position[1] + 24
-    print(f'Squarey {index} at {position[0]},{position[1]}')
-
 
 
 if __name__ == '__main__':
