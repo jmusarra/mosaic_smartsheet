@@ -83,13 +83,13 @@ def get_sheet(sheet_name):
             print(f'Found: {sheet.name}. ID is {sheet_id}')
             cols = ss_client.Sheets.get_columns(sheet_id)
             column_id = cols.data[0].id
-            make_fixture_names(sheet, sheet_id, column_id)
+            get_from_smartsheet(sheet, sheet_id, column_id)
         else:
             print(f'''No results found for "{sheet_name}".
                    Did you use the exact name, and put it in quotes?''')
 
 
-def make_fixture_names(sheet, sheet_id, column_id):
+def get_from_smartsheet(sheet, sheet_id, column_id):
     """
     Gets cable ID and zone, combines them into a fixture name.
 
@@ -99,12 +99,10 @@ def make_fixture_names(sheet, sheet_id, column_id):
     #TODO: test the shit out of this
     print(f'Getting fixture names. Using sheet ID {sheet_id} and column_id {column_id}.')
     fixture_groups = {}
-    id_count = 0
     cable_ids = []
     parent_ids = []
     zone_list = []
     #TODO: unfuck this:
-    num_fixtures = 0
     for row in sheet.rows:
         if row.parent_id is None:
             #row is a parent / cable ID
@@ -112,7 +110,6 @@ def make_fixture_names(sheet, sheet_id, column_id):
                 if cell.column_id == column_id:
                     if cell.value is not None:
                         parent_ids.append(row.id)
-                        id_count += 1
                         cable_id = cell.value
                         if cable_id not in cable_ids:
                             cable_ids.append(cable_id)
@@ -124,13 +121,11 @@ def make_fixture_names(sheet, sheet_id, column_id):
                                         if cell.column_id == column_id:
                                             if cell.value is not None:
                                                 zone_list.append(cell.value)
-                                                fixture_groups[cable_id] = zone_list
-                                            num_fixtures =+ len(zone_list)                    
+                                                fixture_groups[cable_id] = zone_list                 
                             zone_list = [] # reset the list of zone munbers to empty
-    #print(f'Created {len(fixture_names)} fixtures on {id_count} DMX lines.')
     num_fixtures = sum(len(f) for f in fixture_groups.values())
     num_lines = len(fixture_groups.keys())    
-    print(f'Created {num_fixtures} fixtures on {num_lines} DMX lines.')
+    print(f'Found {num_fixtures} fixtures on {num_lines} DMX lines.')
     create_fixture_rows(fixture_groups)
     fucking_around(fixture_groups)
 
@@ -147,8 +142,6 @@ def create_fixture_rows(groups):
     default_angle = 0
     start_x = 24
     start_y = 24
-    num_groups = len(groups.keys())
-    print(f'Number of groups: {num_groups}')
     print('Creating Mosaic layout!')
     fixture_rows = []
     x = start_x
