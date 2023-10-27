@@ -1,18 +1,13 @@
 """
 Uses Smartsheet's API to pull a sheet. Then extracts the zone numbers, then
-uses the exported csv --or modifies in-place??-- the mosaic designer layout.
+uses the writes a .csv which can be imported into mosaic designer to create a layout.
    
 Takes one argument, which must be the full name of the sheet.
-   
 If name contains spaces, enclose the name in quotes
 
-Create .csv directly from smartsheet, and then import?
-
-this could be a web app.
+TODO: this could be a web app.
 
 TODO: use OAuth2 for access/authentication
-
-take sheet_title as argument
 """
 
 __author__ = "John Musarra"
@@ -163,7 +158,6 @@ def create_fixture_rows(groups):
     print(group_names[:1])
 
     for f in fixture_names:
-        #for g in group_names:
         fixture_row = [f,        #fixture name
                    '',           #fixture number - leave blank 
                    '',            #groups
@@ -207,10 +201,27 @@ def make_csv(fixture_rows):
             mosaic_writer.writerow(row)
 
 def fucking_around(groups):
+    #create_zones(groups):
     """
     Well I seem to have adopted the habit of building docstrings
     """
+    # print(groups)
+    # build the thing
+    # for g in groups.values():
+        # Build group label:
+        #blah(group_name, num_fixtures)
 
+    for num, cable_id in enumerate(groups, start = 1):
+        group_name = f"{{{num},'{cable_id}'}}"
+        print(group_name)
+    for cable_id, zone in groups.items():
+        fixtures_per_line = (cable_id, len(zone))
+        print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        for i in range(len(zone)):
+            make_fixtures_for_group(i)
+
+def make_fixtures_for_group(index):
+    print(f'Squarey {index + 1}!')
 
 
 if __name__ == '__main__':
