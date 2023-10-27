@@ -99,12 +99,12 @@ def make_fixture_names(sheet, sheet_id, column_id):
     #TODO: test the shit out of this
     print(f'Getting fixture names. Using sheet ID {sheet_id} and column_id {column_id}.')
     fixture_groups = {}
-    fixture_names = []
     id_count = 0
     cable_ids = []
     parent_ids = []
     zone_list = []
     #TODO: unfuck this:
+    num_fixtures = 0
     for row in sheet.rows:
         if row.parent_id is None:
             #row is a parent / cable ID
@@ -125,11 +125,14 @@ def make_fixture_names(sheet, sheet_id, column_id):
                                             if cell.value is not None:
                                                 zone_list.append(cell.value)
                                                 fixture_groups[cable_id] = zone_list
+                                            num_fixtures =+ len(zone_list)                    
                             zone_list = [] # reset the list of zone munbers to empty
-    print(f'Got {len(zone_list)} fixtures')
-    print(f'Created {len(fixture_names)} fixtures on {id_count} DMX lines.')
-    #pprint(fixture_groups)
+    #print(f'Created {len(fixture_names)} fixtures on {id_count} DMX lines.')
+    num_fixtures = sum(len(f) for f in fixture_groups.values())
+    num_lines = len(fixture_groups.keys())    
+    print(f'Created {num_fixtures} fixtures on {num_lines} DMX lines.')
     create_fixture_rows(fixture_groups)
+    fucking_around(fixture_groups)
 
 def create_fixture_rows(groups):
     """
@@ -142,8 +145,10 @@ def create_fixture_rows(groups):
     default_fixture_width = 24
     default_fixture_height = 24
     default_angle = 0
-    start_x = 0
-    start_y = 0
+    start_x = 24
+    start_y = 24
+    num_groups = len(groups.keys())
+    print(f'Number of groups: {num_groups}')
     print('Creating Mosaic layout!')
     fixture_rows = []
     x = start_x
@@ -151,21 +156,24 @@ def create_fixture_rows(groups):
     fixture_names = []
     # build all fixture names:
     for cable_id, zone in groups.items():
-        #print(f'{cable_id}: {len(zone)} fixtures')
+        print(f'{cable_id}: {len(zone)} fixtures')
         for z in zone:
             fixture_names.append(f'{cable_id} - {z}')
     print(f'Created {len(fixture_names)} fixture names')
+
+    #TODO: look, fuckface, you did all that work to make this be a dictionary, now USE it
 
     # build all group_names
     group_names = []
     for num, name in enumerate(fixture_names, start = 1):
         group_names.append(f"{{{num},'{name}'}}")
-    print(group_names[1])
+    print(group_names[:1])
 
     for f in fixture_names:
+        #for g in group_names:
         fixture_row = [f,        #fixture name
                    '',           #fixture number - leave blank 
-                   g,            #groups
+                   '',            #groups
                    '',           #notes
                    0,            #manufacturer id
                    12,           #model id
@@ -204,6 +212,13 @@ def make_csv(fixture_rows):
         mosaic_writer.writerow(header)
         for row in fixture_rows:
             mosaic_writer.writerow(row)
+
+def fucking_around(groups):
+    """
+    Well I seem to have adopted the habit of building docstrings
+    """
+
+
 
 if __name__ == '__main__':
     arguments = parser.parse_args()
