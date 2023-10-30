@@ -121,7 +121,7 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
     num_fixtures = sum(len(f) for f in fixture_groups.values())
     num_lines = len(fixture_groups.keys())    
     print(f'Found {num_fixtures} fixtures on {num_lines} DMX lines.')
-    create_fixture_rows(fixture_groups)
+    #create_fixture_rows(fixture_groups)
     make_fixtures_for_group(fixture_groups)
 
 def create_fixture_rows(groups):
@@ -179,8 +179,6 @@ def create_fixture_rows(groups):
     #make_csv(fixture_rows)
     #fucking_around(fixture_rows)
 
-
-
 def fucking_around(groups):
     #create_zones(groups):
     """
@@ -201,11 +199,6 @@ def fucking_around(groups):
         for i in range(len(zone)):
             make_fixtures_for_group(i + 1, fixture_rows)
 
-def copy_to(src_list, tgt_list):
-    for i in range(len(src_list)):
-        print(i)
-        #src_list[i][0] = tgt_list[i]
-    return src_list
 
 def make_fixtures_for_group(groups):
     names = []
@@ -215,7 +208,9 @@ def make_fixtures_for_group(groups):
     for cable_id, zone in groups.items():
         fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        #print(len(fixture_rows))
         for i in range(len(zone)):
+            row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
             #print(fixture_names[0])
             position = [24 * i+1, 24]
             if position[0] >= 481:
@@ -223,33 +218,45 @@ def make_fixtures_for_group(groups):
             #print(f'Squarey {i + 1} at {position[0]},{position[1]}')
             row[9] = position[0]
             row[10] = position[1]
+            #print(row)
             fixture_rows.append(row)
-    print(f'Got {len(fixture_rows)} rows')
+            #print(fixture_rows[4])
+        #print(len(fixture_rows))
+    for i, row in enumerate(fixture_rows):
+        print(f'{i+1}: {row}')
+    
+    print(f'Got {len(fixture_rows)} rows qer6sdt6')
+    print(fixture_rows[0])
     # Generate fixture names, add them to the rows:
     for cable_id, zone in groups.items():
-        print(f'{cable_id}: {len(zone)} fixtures')       
+        #print(f'{cable_id}: {len(zone)} fixtures')       
         for z in zone:
             name = f'{cable_id} - {z}'
             names.append(name)
+    print(f'Names: {len(names)}')
+    print(f'Rows: {len(fixture_rows)}')
     for i, row in enumerate(fixture_rows):
-        fixture_rows[i][0] = name
+        #if len(fixture_rows[i]) == 1:
+        fixture_rows[i][0] = names[i]
+        #print(f'{i}: {fixture_rows[i]}')
         #fixture_names.append(name)
-        print(len(fixture_names))
-    print(f'There are {len(names)} fixture names.')
-    print(names)
+        #print(len(fixture_names))
+    #print(fixture_rows[0:20])
+    #print(names)
     #--------------------this works ^^
     #----this doesn't: ---------------
     #     unless it does....
     
         #fixture_rows[i][0] = fixture_names[i]
-    print(len(fixture_rows))
-    print(fixture_rows[0])
-    print(fixture_rows[-1])
+    #print(fixture_rows[0])
+    #print(fixture_rows[-1])
     make_csv(fixture_rows)
 
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
     print('Making a CSV!')
+    print('Just kidding!')
+    pass
     layout_name = sheet_name
     with open(f'{layout_name}.csv', 'w', newline = '', encoding='cp1252') as csv_file:
         header = ['Name',
@@ -268,7 +275,7 @@ def make_csv(fixture_rows):
         mosaic_writer.writerow(header)
         for row in fixture_rows:
             mosaic_writer.writerow(row)
-
+   
 
 if __name__ == '__main__':
     arguments = parser.parse_args()
