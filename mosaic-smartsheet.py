@@ -203,20 +203,21 @@ def fucking_around(groups):
 def make_fixtures_for_group(groups):
     names = []
     fixture_rows = []
-    fixture_names = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
+    row_num = 1
     for cable_id, zone in groups.items():
         fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        row_num += 2
         for i in range(len(zone)):
+            position = [24 * i+1, 24 * row_num]
             row = ['', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
-            position = [24 * i+1, 24]
             if position[0] >= 481:
-                position[1] += 24
+                position[0] = 24
+                position[1] = position[1] + row_num + 24
             #print(f'Squarey {i + 1} at {position[0]},{position[1]}')
             row[9] = position[0]
             row[10] = position[1]
-            #print(row)
             fixture_rows.append(row)
     for i, row in enumerate(fixture_rows):
         print(f'{i+1}: {row}')
@@ -231,20 +232,7 @@ def make_fixtures_for_group(groups):
     print(f'Names: {len(names)}')
     print(f'Rows: {len(fixture_rows)}')
     for i, row in enumerate(fixture_rows):
-        #if len(fixture_rows[i]) == 1:
         fixture_rows[i][0] = names[i]
-        #print(f'{i}: {fixture_rows[i]}')
-        #fixture_names.append(name)
-        #print(len(fixture_names))
-    #print(fixture_rows[0:20])
-    #print(names)
-    #--------------------this works ^^
-    #----this doesn't: ---------------
-    #     unless it does....
-    
-        #fixture_rows[i][0] = fixture_names[i]
-    #print(fixture_rows[0])
-    #print(fixture_rows[-1])
     make_csv(fixture_rows)
 
 def make_csv(fixture_rows):
