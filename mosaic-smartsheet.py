@@ -204,17 +204,18 @@ def make_fixtures_for_group(groups):
     names = []
     fixture_rows = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
-    row_num = 1
+    group_num = 1
     for cable_id, zone in groups.items():
-        fixtures_per_line = (cable_id, len(zone))
+        #fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
-        row_num += 2
+        group_num += 2
         for i in range(len(zone)):
-            position = [24 * i+1, 24 * row_num]
             row = ['', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
-            if position[0] >= 481:
-                position[0] = 24
-                position[1] = position[1] + row_num + 24
+            position = [24 * (i+1), 24 * group_num]
+            #if position[0] >= 481:
+            #    position[0] = 24
+            #    position[1] += group_num
+             #   group_num += 1
             #print(f'Squarey {i + 1} at {position[0]},{position[1]}')
             row[9] = position[0]
             row[10] = position[1]
@@ -238,7 +239,6 @@ def make_fixtures_for_group(groups):
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
     print('Making a CSV!')
-    print('Just kidding!')
     layout_name = sheet_name
     with open(f'{layout_name}.csv', 'w', newline = '', encoding='cp1252') as csv_file:
         header = ['Name',
