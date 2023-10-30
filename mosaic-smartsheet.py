@@ -208,10 +208,8 @@ def make_fixtures_for_group(groups):
     for cable_id, zone in groups.items():
         fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
-        #print(len(fixture_rows))
         for i in range(len(zone)):
-            row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
-            #print(fixture_names[0])
+            row = ['', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
             position = [24 * i+1, 24]
             if position[0] >= 481:
                 position[1] += 24
@@ -220,11 +218,8 @@ def make_fixtures_for_group(groups):
             row[10] = position[1]
             #print(row)
             fixture_rows.append(row)
-            #print(fixture_rows[4])
-        #print(len(fixture_rows))
     for i, row in enumerate(fixture_rows):
         print(f'{i+1}: {row}')
-    
     print(f'Got {len(fixture_rows)} rows qer6sdt6')
     print(fixture_rows[0])
     # Generate fixture names, add them to the rows:
@@ -256,7 +251,6 @@ def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
     print('Making a CSV!')
     print('Just kidding!')
-    pass
     layout_name = sheet_name
     with open(f'{layout_name}.csv', 'w', newline = '', encoding='cp1252') as csv_file:
         header = ['Name',
