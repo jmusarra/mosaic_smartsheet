@@ -27,7 +27,7 @@ import smartsheet
 #TODO: make the fixture_types table
 import fixture_types
 
-REMOTE_SERVER = '4wall.com'
+REMOTE_SERVER = 'smartsheet.com'
 TESTING_SHEET_ID = 8769876857776004
 TESTING_COLUMN_ID = 1182995975038852
 
@@ -52,11 +52,9 @@ def check_for_internet(hostname):
         s = socket.create_connection((host, 443), 2)
         s.close()
         return True
-    except Exception:
-        #TODO: actually catch and handle socket exceptions
-        # "except: pass" you fuckin yuntz
-        pass
-    return False
+    except TimeoutError:
+        print("The network connection timed out. Try agan later.")
+        return False
 
 def get_sheet(sheet_name):
     """
@@ -116,14 +114,16 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
                                         if cell.column_id == column_id:
                                             if cell.value is not None:
                                                 zone_list.append(cell.value)
-                                                fixture_groups[cable_id] = zone_list                 
+                                                fixture_groups[cable_id] = zone_list
                             zone_list = [] # reset the list of zone munbers to empty
     num_fixtures = sum(len(f) for f in fixture_groups.values())
-    num_lines = len(fixture_groups.keys())    
+    num_lines = len(fixture_groups.keys())
     print(f'Found {num_fixtures} fixtures on {num_lines} DMX lines.')
     #create_fixture_rows(fixture_groups)
     make_fixtures_for_group(fixture_groups)
 
+'''
+TODO: delete this
 def create_fixture_rows(groups):
     """
     Creates the rows of fixture information to be CSV'ified.
@@ -176,31 +176,14 @@ def create_fixture_rows(groups):
             x = start_x
         fixture_rows.append(fixture_row)
     print(f'Created {len(fixture_rows)} fixture rows.')
-    #make_csv(fixture_rows)
-    #fucking_around(fixture_rows)
-
-def fucking_around(groups):
-    #create_zones(groups):
-    """
-    Well I seem to have adopted the habit of building docstrings
-    """
-    # print(groups)
-    # build the thing
-    # for g in groups.values():
-        # Build group label:
-        #blah(group_name, num_fixtures)
-
-    for num, cable_id in enumerate(groups, start = 1):
-        group_name = f"{{{num},'{cable_id}'}}"
-        print(group_name)
-    for cable_id, zone in groups.items():
-        fixtures_per_line = (cable_id, len(zone))
-        print(f'Creating {len(zone)} lil squareys for {cable_id}...')
-        for i in range(len(zone)):
-            make_fixtures_for_group(i + 1, fixture_rows)
-
+    '''
 
 def make_fixtures_for_group(groups):
+    """
+    TODO: make docstring
+
+    it should go here
+    """
     names = []
     fixture_rows = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
@@ -226,7 +209,7 @@ def make_fixtures_for_group(groups):
     print(fixture_rows[0])
     # Generate fixture names, add them to the rows:
     for cable_id, zone in groups.items():
-        #print(f'{cable_id}: {len(zone)} fixtures')       
+        #print(f'{cable_id}: {len(zone)} fixtures')
         for z in zone:
             name = f'{cable_id} - {z}'
             names.append(name)
@@ -257,7 +240,6 @@ def make_csv(fixture_rows):
         mosaic_writer.writerow(header)
         for row in fixture_rows:
             mosaic_writer.writerow(row)
-   
 
 if __name__ == '__main__':
     arguments = parser.parse_args()
