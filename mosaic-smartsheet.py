@@ -69,8 +69,9 @@ def get_sheet(sheet_name):
     print(f'Sheet to get: {sheet_name}')
     search_result = ss_client.Search.search(sheet_name, scopes = 'sheetNames').results
     print(f'found {len(search_result)} results.')
-    for r in range(len(search_result)):
-        if (search_result[r].text) == sheet_name:
+    #for r in range(len(search_result)):
+    for i, r in enumerate(search_result):
+        if (search_result[i].text) == sheet_name:
             sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
             sheet = ss_client.Sheets.get_sheet(sheet_id)
             print(f'Found: {sheet.name}. ID is {sheet_id}')
