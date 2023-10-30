@@ -25,7 +25,8 @@ import sys
 # import urllib
 import smartsheet
 #TODO: make the fixture_types table
-import fixture_types
+from fixture_types import generic_types
+print(generic_types['RGB8'])
 
 REMOTE_SERVER = 'smartsheet.com'
 TESTING_SHEET_ID = 8769876857776004
@@ -206,7 +207,7 @@ def make_fixtures_for_group(groups):
             fixture_rows.append(row)
     for i, row in enumerate(fixture_rows):
         print(f'{i+1}: {row}')
-    print(f'Got {len(fixture_rows)} rows qer6sdt6')
+    print(f'Got {len(fixture_rows)} rows')
     print(fixture_rows[0])
     # Generate fixture names, add them to the rows:
     for cable_id, zone in groups.items():
