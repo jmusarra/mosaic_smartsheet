@@ -176,7 +176,7 @@ def create_fixture_rows(groups):
             x = start_x
         fixture_rows.append(fixture_row)
     print(f'Created {len(fixture_rows)} fixture rows.')
-    make_csv(fixture_rows)
+    #make_csv(fixture_rows)
     #fucking_around(fixture_rows)
 
 
@@ -201,26 +201,55 @@ def fucking_around(groups):
         for i in range(len(zone)):
             make_fixtures_for_group(i + 1, fixture_rows)
 
+def copy_to(src_list, tgt_list):
+    for i in range(len(src_list)):
+        print(i)
+        #src_list[i][0] = tgt_list[i]
+    return src_list
+
 def make_fixtures_for_group(groups):
+    names = []
     fixture_rows = []
+    fixture_names = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
     for cable_id, zone in groups.items():
         fixtures_per_line = (cable_id, len(zone))
-        print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
         for i in range(len(zone)):
             #print(fixture_names[0])
             position = [24 * i+1, 24]
             if position[0] >= 481:
                 position[1] += 24
-            print(f'Squarey {i + 1} at {position[0]},{position[1]}')
+            #print(f'Squarey {i + 1} at {position[0]},{position[1]}')
             row[9] = position[0]
             row[10] = position[1]
             fixture_rows.append(row)
-        print(fixture_rows[-1])
+    print(f'Got {len(fixture_rows)} rows')
+    # Generate fixture names, add them to the rows:
+    for cable_id, zone in groups.items():
+        print(f'{cable_id}: {len(zone)} fixtures')       
+        for z in zone:
+            name = f'{cable_id} - {z}'
+            names.append(name)
+    for i, row in enumerate(fixture_rows):
+        fixture_rows[i][0] = name
+        #fixture_names.append(name)
+        print(len(fixture_names))
+    print(f'There are {len(names)} fixture names.')
+    print(names)
+    #--------------------this works ^^
+    #----this doesn't: ---------------
+    #     unless it does....
+    
+        #fixture_rows[i][0] = fixture_names[i]
+    print(len(fixture_rows))
+    print(fixture_rows[0])
+    print(fixture_rows[-1])
+    make_csv(fixture_rows)
 
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
-
+    print('Making a CSV!')
     layout_name = sheet_name
     with open(f'{layout_name}.csv', 'w', newline = '', encoding='cp1252') as csv_file:
         header = ['Name',
