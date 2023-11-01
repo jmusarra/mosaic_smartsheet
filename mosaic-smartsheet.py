@@ -22,7 +22,6 @@ import csv
 import logging
 import sys
 
-# import urllib
 import smartsheet
 #TODO: make the fixture_types table
 from fixture_types import generic_types
@@ -51,11 +50,12 @@ def check_for_internet(hostname):
     try:
         host = socket.gethostbyname(hostname)
         s = socket.create_connection((host, 443), 2)
-        s.close()
         return True
     except TimeoutError:
         print("The network connection timed out. Try agan later.")
         return False
+    finally:
+        s.close()
 
 def get_sheet(sheet_name):
     """
@@ -63,7 +63,7 @@ def get_sheet(sheet_name):
 
     Queries the Smartsheet API and searches for the string provided as the argument
     to mosaic-smartsheet.py. Uses that to get us a sheet_id, then takes the first
-    column as our Cable ID / zone information.
+    column of that sheet as our Cable ID / zone information.
     """
     ss_client = smartsheet.Smartsheet()
     ss_client.errors_as_exceptions(True)
