@@ -126,9 +126,11 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
 
 def make_fixtures_for_group(groups):
     """
-    TODO: make docstring
+    Takes dictionary of fixture rows, generates fixture names and positions
 
-    it should go here
+    Create fixture names by concatenating the cable ID and zone number fields.
+    Additionally, calculate X and Y coordinates for each fixture on the Mosaic
+    layout.
     """
     names = []
     fixture_rows = []
