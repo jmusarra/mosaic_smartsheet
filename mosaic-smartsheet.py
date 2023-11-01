@@ -177,10 +177,24 @@ def make_bg(w, h):
     Create a background image for the layout
 
     Create an image with dimensions of layout_width x layout_height pixels. Draw borders
-    for each row of fixtures. Add text for informational labels - Cable ID and num fixtures
+    around each row of fixtures. Add text for informational labels - Cable ID and num fixtures
     """
-    print(f'Layout width: {w + 100} pixels.')
-    print(f'Layout height: {h + 100} pixels.')
+    #scale it up:
+    w = w + 200
+    h = h + 200
+    print(f'Layout width: {w} pixels.')
+    print(f'Layout height: {h} pixels.')
+    bg_filename = f'{sheet_name}.png'
+    # create solid white bg image, using coordinates of the last fixture as overall size:
+    bg = Image.new('RGBA', (w, h), (255, 255,255, 255))
+    fnt = ImageFont.truetype("resources/officecodepro-regular.otf", 19)
+    #draw header row:
+    draw = ImageDraw.Draw(bg)
+    draw.fontmode = "L"
+    draw.rectangle((10, 10, w, 40), outline = (0, 0, 0), width = 3)
+    draw.text((16,14), sheet_name, font = fnt, fill = (0, 0, 0))
+    draw.text((16,14), sheet_name, font = fnt, fill = (0, 0, 0))
+    bg.save(bg_filename)
 
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
