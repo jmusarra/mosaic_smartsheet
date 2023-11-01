@@ -25,6 +25,8 @@ import sys
 import smartsheet
 #TODO: make the fixture_types table
 from fixture_types import generic_types
+from PIL import Image, ImageDraw, ImageFont
+
 print(generic_types['RGB8'])
 
 REMOTE_SERVER = 'smartsheet.com'
@@ -165,7 +167,20 @@ def make_fixtures_for_group(groups):
     print(f'Rows: {len(fixture_rows)}')
     for i, row in enumerate(fixture_rows):
         fixture_rows[i][0] = names[i]
+    layout_width = fixture_rows[-1][9]
+    layout_height = fixture_rows[-1][10]
+    make_bg(layout_width, layout_height)
     make_csv(fixture_rows)
+
+def make_bg(w, h):
+    """
+    Create a background image for the layout
+
+    Create an image with dimensions of layout_width x layout_height pixels. Draw borders
+    for each row of fixtures. Add text for informational labels - Cable ID and num fixtures
+    """
+    print(f'Layout width: {w + 100} pixels.')
+    print(f'Layout height: {h + 100} pixels.')
 
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
