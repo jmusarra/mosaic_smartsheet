@@ -124,62 +124,6 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
     #create_fixture_rows(fixture_groups)
     make_fixtures_for_group(fixture_groups)
 
-'''
-TODO: delete this
-def create_fixture_rows(groups):
-    """
-    Creates the rows of fixture information to be CSV'ified.
-
-    Takes the list of fixture names from Smartsheet, then adds the rest of the
-    columns that Mosaic expects to create a full row.
-    """
-    default_fixture_number = ''
-    default_fixture_width = 24
-    default_fixture_height = 24
-    default_angle = 0
-    start_x = 24
-    start_y = 24
-    print('Creating Mosaic layout!')
-    fixture_rows = []
-    x = start_x
-    y = start_y
-    fixture_names = []
-    # build all fixture names:
-    for cable_id, zone in groups.items():
-        print(f'{cable_id}: {len(zone)} fixtures')
-        for z in zone:
-            fixture_names.append(f'{cable_id} - {z}')
-    print(f'Created {len(fixture_names)} fixture names')
-
-    #TODO: look, fuckface, you did all that work to make this be a dictionary, now USE it
-
-    # build all group_names
-    group_names = []
-    for num, name in enumerate(fixture_names, start = 1):
-        group_names.append(f"{{{num},'{name}'}}")
-    print(group_names[:1])
-
-    for f in fixture_names:
-        fixture_row = [f,        #fixture name
-                   '',           #fixture number - leave blank 
-                   '',            #groups
-                   '',           #notes
-                   0,            #manufacturer id
-                   12,           #model id
-                   65,           #mode ID
-                   24,           #width
-                   24,           #height
-                   x,            #x
-                   y,            #y
-                   0]            #angle
-        x += default_fixture_width
-        if x >= 481: #20 fixtures wide
-            y += default_fixture_height
-            x = start_x
-        fixture_rows.append(fixture_row)
-    print(f'Created {len(fixture_rows)} fixture rows.')
-    '''
-
 def make_fixtures_for_group(groups):
     """
     TODO: make docstring
