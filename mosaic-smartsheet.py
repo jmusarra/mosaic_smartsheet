@@ -193,6 +193,8 @@ def make_bg(w, h, labels):
     #oversize the layout just a little:
     w = w + 200
     h = h + 200
+    if w < 750:
+        w = 750
     print(f'Layout is: {w}w x {h}h pixels.')
     bg_filename = f'{sheet_name}.jpg'
     # create solid white bg image, using coordinates of the last fixture as overall size:
