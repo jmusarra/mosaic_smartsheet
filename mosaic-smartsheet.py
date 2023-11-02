@@ -138,6 +138,7 @@ def make_fixtures_for_group(groups):
     fixture_rows = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
     widths = []
+    row_coords = []
     group_num = 1
     for cable_id, zone in groups.items():
         #fixtures_per_line = (cable_id, len(zone))
@@ -154,6 +155,7 @@ def make_fixtures_for_group(groups):
             row[9] = position[0]
             row[10] = position[1]
             widths.append(position[0])
+            row_coords.append(position[1])
             fixture_rows.append(row)
     for i, row in enumerate(fixture_rows):
         print(f'{i+1}: {row}')
@@ -171,10 +173,12 @@ def make_fixtures_for_group(groups):
         fixture_rows[i][0] = names[i]
     layout_width = max(widths)
     layout_height = fixture_rows[-1][10]
-    make_bg(layout_width, layout_height)
+    rows = sorted(set(row_coords))
+    print(rows)
+    make_bg(layout_width, layout_height, rows)
     make_csv(fixture_rows)
 
-def make_bg(w, h):
+def make_bg(w, h, rows):
     """
     Create a background image for the layout
 
