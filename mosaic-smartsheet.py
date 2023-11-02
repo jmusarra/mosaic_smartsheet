@@ -201,7 +201,7 @@ def make_bg(w, h, labels):
     fnt_label = ImageFont.truetype("resources/VeraMono-Bold.ttf", 20)
     # draw header row:
     d = ImageDraw.Draw(bg)
-    d.fontmode = "1"
+    d.fontmode = "L"
     d.rectangle((10, 10, (w-10), 45), outline = (0, 0, 0), width = 3)
     d.text(((w/2),38), sheet_name, font = fnt_title, fill = (0, 0, 0), anchor = 'ms')
     # draw individual row labels:
