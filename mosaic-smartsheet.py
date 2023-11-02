@@ -178,27 +178,27 @@ def make_fixtures_for_group(groups):
     #print(remove_dupes(label_coords))
     #print(remove_dupes(label_text))
     labels = zip(remove_dupes(label_coords), remove_dupes(label_text))
-    print(list(labels))
+    #print(list(labels))
     print(f'Names: {len(names)}')
     print(f'Rows: {len(fixture_rows)}')
-    #for i, row in enumerate(fixture_rows):
-    #   fixture_rows[i][0] = names[i]
+    for i, row in enumerate(fixture_rows):
+       fixture_rows[i][0] = names[i]
     layout_width = max(widths)
     layout_height = fixture_rows[-1][10]
     #rows = sorted(set(row_coords)) #I used a set!
     #for i, row in enumerate(fixture_rows):
     #   print(f'{i+1}: {row}')
-    make_bg(layout_width, layout_height, 5)
+    make_bg(layout_width, layout_height, labels)
     make_csv(fixture_rows)
 
-def make_bg(w, h, rows):
+def make_bg(w, h, labels):
     """
     Create a background image for the layout
 
     Create an image with dimensions of layout_width x layout_height pixels. Draw borders
-    around each row of fixtures. Add text for informational labels - Cable ID and num fixtures
+    around each row of fixtures. Add text for informational labels - Cable ID and num fixtures.
+    Label positions and text are supplied by the dict passed in as 'labels'.
     """
-    #scale it up:
     w = w + 200
     h = h + 200
     print(f'Layout width: {w} pixels.')
@@ -206,14 +206,17 @@ def make_bg(w, h, rows):
     bg_filename = f'{sheet_name}.png'
     # create solid white bg image, using coordinates of the last fixture as overall size:
     bg = Image.new('RGBA', (w, h), (255, 255,255, 255))
-    fnt = ImageFont.truetype("resources/VeraMono.ttf", 19)
-    #draw header row:
+    fnt_title = ImageFont.truetype("resources/VeraMono.ttf", 20)
+    fnt_label = ImageFont.truetype("resources/VeraMono.ttf", 15)
+    # draw header row:
     d = ImageDraw.Draw(bg)
     d.fontmode = "1"
     d.rectangle((10, 10, (w-10), 40), outline = (0, 0, 0), width = 3)
-    d.text(((w/2),32), sheet_name, font = fnt, fill = (0, 0, 0), anchor = 'ms')
-    #for r in rows:
-    #   d.text
+    d.text(((w/2),32), sheet_name, font = fnt_title, fill = (0, 0, 0), anchor = 'ms')
+    # draw individual row labels:
+    for position, label_text in dict(labels).items():
+       d.text((20, position-14), label_text, font = fnt_label, fill = (0,0,0), anchor = 'ls')
+       print(f'{label_text}: {position}')
     bg.save(bg_filename)
 
 def make_csv(fixture_rows):
