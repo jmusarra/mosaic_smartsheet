@@ -137,6 +137,7 @@ def make_fixtures_for_group(groups):
     names = []
     fixture_rows = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
+    widths = []
     group_num = 1
     for cable_id, zone in groups.items():
         #fixtures_per_line = (cable_id, len(zone))
@@ -148,10 +149,11 @@ def make_fixtures_for_group(groups):
             #if position[0] >= 481:
             #    position[0] = 24
             #    position[1] += group_num
-             #   group_num += 1
+            #   group_num += 1
             #print(f'Squarey {i + 1} at {position[0]},{position[1]}')
             row[9] = position[0]
             row[10] = position[1]
+            widths.append(position[0])
             fixture_rows.append(row)
     for i, row in enumerate(fixture_rows):
         print(f'{i+1}: {row}')
@@ -167,7 +169,7 @@ def make_fixtures_for_group(groups):
     print(f'Rows: {len(fixture_rows)}')
     for i, row in enumerate(fixture_rows):
         fixture_rows[i][0] = names[i]
-    layout_width = fixture_rows[-1][9]
+    layout_width = max(widths)
     layout_height = fixture_rows[-1][10]
     make_bg(layout_width, layout_height)
     make_csv(fixture_rows)
@@ -187,13 +189,12 @@ def make_bg(w, h):
     bg_filename = f'{sheet_name}.png'
     # create solid white bg image, using coordinates of the last fixture as overall size:
     bg = Image.new('RGBA', (w, h), (255, 255,255, 255))
-    fnt = ImageFont.truetype("resources/officecodepro-regular.otf", 19)
+    fnt = ImageFont.truetype("resources/VeraMono.ttf", 19)
     #draw header row:
-    draw = ImageDraw.Draw(bg)
-    draw.fontmode = "L"
-    draw.rectangle((10, 10, w, 40), outline = (0, 0, 0), width = 3)
-    draw.text((16,14), sheet_name, font = fnt, fill = (0, 0, 0))
-    draw.text((16,14), sheet_name, font = fnt, fill = (0, 0, 0))
+    d = ImageDraw.Draw(bg)
+    d.fontmode = "1"
+    d.rectangle((10, 10, (w-10), 40), outline = (0, 0, 0), width = 3)
+    d.text(((w/2),32), sheet_name, font = fnt, fill = (0, 0, 0), anchor = 'ms')
     bg.save(bg_filename)
 
 def make_csv(fixture_rows):
