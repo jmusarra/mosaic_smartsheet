@@ -59,6 +59,14 @@ def check_for_internet(hostname):
     finally:
         s.close()
 
+def remove_dupes(list):
+    """
+    Removes duplicates from a list, while preserving order
+    """
+    seen = set()
+    seen_add = seen.add
+    return [x for x in list if not (x in seen or seen_add(x))]
+
 def get_sheet(sheet_name):
     """
     Gets the relevant info from the specified Smartsheet.
@@ -138,15 +146,16 @@ def make_fixtures_for_group(groups):
     fixture_rows = []
     row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
     widths = []
-    row_coords = []
+    label_coords, label_text = [], []
     group_num = 1
     for cable_id, zone in groups.items():
         #fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
         group_num += 2
         for i in range(len(zone)):
-            row = ['', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
+            row = ['BLANK', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
             position = [24 * (i+1), 24 * group_num]
+            # this didn't work out very well. Needs help.
             #if position[0] >= 481:
             #    position[0] = 24
             #    position[1] += group_num
@@ -155,27 +164,31 @@ def make_fixtures_for_group(groups):
             row[9] = position[0]
             row[10] = position[1]
             widths.append(position[0])
-            row_coords.append(position[1])
+            label_coords.append(position[1])
             fixture_rows.append(row)
-    for i, row in enumerate(fixture_rows):
-        print(f'{i+1}: {row}')
     print(f'Got {len(fixture_rows)} rows')
-    print(fixture_rows[0])
     # Generate fixture names, add them to the rows:
     for cable_id, zone in groups.items():
         #print(f'{cable_id}: {len(zone)} fixtures')
         for z in zone:
             name = f'{cable_id} - {z}'
             names.append(name)
+            label_text.append(cable_id)
+    # remove dupes from each of these lists, but preserve order
+    #print(remove_dupes(label_coords))
+    #print(remove_dupes(label_text))
+    labels = zip(remove_dupes(label_coords), remove_dupes(label_text))
+    print(list(labels))
     print(f'Names: {len(names)}')
     print(f'Rows: {len(fixture_rows)}')
-    for i, row in enumerate(fixture_rows):
-        fixture_rows[i][0] = names[i]
+    #for i, row in enumerate(fixture_rows):
+    #   fixture_rows[i][0] = names[i]
     layout_width = max(widths)
     layout_height = fixture_rows[-1][10]
-    rows = sorted(set(row_coords))
-    print(rows)
-    make_bg(layout_width, layout_height, rows)
+    #rows = sorted(set(row_coords)) #I used a set!
+    #for i, row in enumerate(fixture_rows):
+    #   print(f'{i+1}: {row}')
+    make_bg(layout_width, layout_height, 5)
     make_csv(fixture_rows)
 
 def make_bg(w, h, rows):
@@ -199,6 +212,8 @@ def make_bg(w, h, rows):
     d.fontmode = "1"
     d.rectangle((10, 10, (w-10), 40), outline = (0, 0, 0), width = 3)
     d.text(((w/2),32), sheet_name, font = fnt, fill = (0, 0, 0), anchor = 'ms')
+    #for r in rows:
+    #   d.text
     bg.save(bg_filename)
 
 def make_csv(fixture_rows):
