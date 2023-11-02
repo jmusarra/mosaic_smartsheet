@@ -27,7 +27,7 @@ import smartsheet
 from fixture_types import generic_types
 from PIL import Image, ImageDraw, ImageFont
 
-print(generic_types['RGB8'])
+#print(generic_types['RGB8'])
 
 REMOTE_SERVER = 'smartsheet.com'
 TESTING_SHEET_ID = 8769876857776004
@@ -44,11 +44,12 @@ parser.add_argument('title',
                             the sheet name contains spaces''')
 
 def check_for_internet(hostname):
-    '''
-    see if we have a working internet connection
-    copied from 
+    """
+    See if we have a working internet connection
+    Initial implementation copied from 
     https://stackoverflow.com/questions/20913411/test-if-an-internet-connection-is-present-in-python
-    '''
+    """
+    print(f'Attempting to reach {REMOTE_SERVER}...')
     try:
         host = socket.gethostbyname(hostname)
         s = socket.create_connection((host, 443), 2)
@@ -79,13 +80,13 @@ def get_sheet(sheet_name):
     ss_client.errors_as_exceptions(True)
     print(f'Sheet to get: {sheet_name}')
     search_result = ss_client.Search.search(sheet_name, scopes = 'sheetNames').results
-    print(f'found {len(search_result)} results.')
+    print(f'Found {len(search_result)} results.')
     #for r in range(len(search_result)):
     for i, r in enumerate(search_result):
         if (search_result[i].text) == sheet_name:
             sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
             sheet = ss_client.Sheets.get_sheet(sheet_id)
-            print(f'Found: {sheet.name}. ID is {sheet_id}')
+            print(f'Using: {sheet.name}. ID is {sheet_id}')
             cols = ss_client.Sheets.get_columns(sheet_id)
             column_id = cols.data[0].id
             get_from_smartsheet(sheet, sheet_id, column_id)
@@ -151,7 +152,7 @@ def make_fixtures_for_group(groups):
     for cable_id, zone in groups.items():
         #fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
-        group_num += 2
+        group_num += 3
         for i in range(len(zone)):
             row = ['BLANK', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
             position = [24 * (i+1), 24 * group_num]
@@ -166,7 +167,6 @@ def make_fixtures_for_group(groups):
             widths.append(position[0])
             label_coords.append(position[1])
             fixture_rows.append(row)
-    print(f'Got {len(fixture_rows)} rows')
     # Generate fixture names, add them to the rows:
     for cable_id, zone in groups.items():
         #print(f'{cable_id}: {len(zone)} fixtures')
@@ -174,20 +174,11 @@ def make_fixtures_for_group(groups):
             name = f'{cable_id} - {z}'
             names.append(name)
             label_text.append(cable_id)
-    # remove dupes from each of these lists, but preserve order
-    #print(remove_dupes(label_coords))
-    #print(remove_dupes(label_text))
     labels = zip(remove_dupes(label_coords), remove_dupes(label_text))
-    #print(list(labels))
-    print(f'Names: {len(names)}')
-    print(f'Rows: {len(fixture_rows)}')
     for i, row in enumerate(fixture_rows):
-       fixture_rows[i][0] = names[i]
+        fixture_rows[i][0] = names[i]
     layout_width = max(widths)
     layout_height = fixture_rows[-1][10]
-    #rows = sorted(set(row_coords)) #I used a set!
-    #for i, row in enumerate(fixture_rows):
-    #   print(f'{i+1}: {row}')
     make_bg(layout_width, layout_height, labels)
     make_csv(fixture_rows)
 
@@ -199,29 +190,30 @@ def make_bg(w, h, labels):
     around each row of fixtures. Add text for informational labels - Cable ID and num fixtures.
     Label positions and text are supplied by the dict passed in as 'labels'.
     """
+    #oversize the layout just a little:
     w = w + 200
     h = h + 200
-    print(f'Layout width: {w} pixels.')
-    print(f'Layout height: {h} pixels.')
-    bg_filename = f'{sheet_name}.png'
+    print(f'Layout is: {w}w + {h} hpixels.')
+    bg_filename = f'{sheet_name}.jpg'
     # create solid white bg image, using coordinates of the last fixture as overall size:
-    bg = Image.new('RGBA', (w, h), (255, 255,255, 255))
-    fnt_title = ImageFont.truetype("resources/VeraMono.ttf", 20)
-    fnt_label = ImageFont.truetype("resources/VeraMono.ttf", 15)
+    bg = Image.new('RGB', (w, h), (255, 255,255))
+    fnt_title = ImageFont.truetype("resources/VeraMono-Bold.ttf", 24)
+    fnt_label = ImageFont.truetype("resources/VeraMono-Bold.ttf", 20)
     # draw header row:
     d = ImageDraw.Draw(bg)
     d.fontmode = "1"
-    d.rectangle((10, 10, (w-10), 40), outline = (0, 0, 0), width = 3)
-    d.text(((w/2),32), sheet_name, font = fnt_title, fill = (0, 0, 0), anchor = 'ms')
+    d.rectangle((10, 10, (w-10), 45), outline = (0, 0, 0), width = 3)
+    d.text(((w/2),38), sheet_name, font = fnt_title, fill = (0, 0, 0), anchor = 'ms')
     # draw individual row labels:
     for position, label_text in dict(labels).items():
-       d.text((20, position-14), label_text, font = fnt_label, fill = (0,0,0), anchor = 'ls')
-       print(f'{label_text}: {position}')
-    bg.save(bg_filename)
+        d.text((20, position-14), label_text, font = fnt_label, fill = (0,0,0), anchor = 'ls')
+    bg.save(bg_filename, dpi=(256, 256), format = 'jpeg', subsampling = 0, quality = 97)
+    # dpi. compress_level
+    print(f'Background image saved as {bg_filename}')
 
 def make_csv(fixture_rows):
     """Writes the generated rows to an excel-formatted CSV file"""
-    print('Making a CSV!')
+    #print('Making a CSV!')
     layout_name = sheet_name
     with open(f'{layout_name}.csv', 'w', newline = '', encoding='cp1252') as csv_file:
         header = ['Name',
@@ -240,6 +232,7 @@ def make_csv(fixture_rows):
         mosaic_writer.writerow(header)
         for row in fixture_rows:
             mosaic_writer.writerow(row)
+    print(f'CSV saved as {layout_name}.csv.')
 
 if __name__ == '__main__':
     arguments = parser.parse_args()
