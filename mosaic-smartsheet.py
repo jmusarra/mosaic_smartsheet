@@ -113,7 +113,7 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
     #TODO: unfuck this:
     for row in sheet.rows:
         if row.parent_id is None:
-            #row is a parent / cable ID
+            #row is a parent / cable ID (or just something wierd :( )
             for cell in row.cells:
                 if cell.column_id == column_id:
                     if cell.value is not None:
@@ -129,8 +129,8 @@ def get_from_smartsheet(sheet, sheet_id, column_id):
                                         if cell.column_id == column_id:
                                             if cell.value is not None:
                                                 zone_list.append(cell.value)
-                                                fixture_groups[cable_id] = zone_list
-                            zone_list = [] # reset the list of zone munbers to empty
+                                fixture_groups[cable_id] = zone_list
+                            zone_list = [] # reset the list of zone numbers to empty
     num_fixtures = sum(len(f) for f in fixture_groups.values())
     num_lines = len(fixture_groups.keys())
     print(f'Found {num_fixtures} fixtures on {num_lines} DMX lines.')
@@ -152,7 +152,7 @@ def make_fixtures_for_group(groups):
     label_coords, label_text = [], []
     group_num = 1
     for cable_id, zone in groups.items():
-        #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
+        print(f'Creating {cable_id} - {len(zone)} fixtures')
         group_num += 3
         for i in range(len(zone)):
             row = ['BLANK', '', '', '', 0, 12, 65, 24, 24, 0, 0, 0]
@@ -191,7 +191,7 @@ def make_bg(w, h, labels):
     around each row of fixtures. Add text for informational labels - Cable ID and num fixtures.
     Label positions and text are supplied by the dict passed in as 'labels'.
     """
-    #oversize the layout just a little:
+    # oversize the layout just a little:
     w = w + 200
     h = h + 200
     w = max(w, 750)
