@@ -24,8 +24,8 @@ import sys
 
 import smartsheet
 #TODO: make the fixture_types table
-from fixture_types import generic_types
 from PIL import Image, ImageDraw, ImageFont
+from fixture_types import generic_types
 
 #print(generic_types['RGB8'])
 
@@ -60,15 +60,15 @@ def check_for_internet(hostname):
     finally:
         s.close()
 
-def remove_dupes(list):
+def remove_dupes(alist):
     """
     Removes duplicates from a list, while preserving order
     """
     seen = set()
     seen_add = seen.add
-    return [x for x in list if not (x in seen or seen_add(x))]
+    return [x for x in alist if not (x in seen or seen_add(x))]
 
-def get_sheet(sheet_name):
+def get_sheet(name):
     """
     Gets the relevant info from the specified Smartsheet.
 
@@ -78,20 +78,22 @@ def get_sheet(sheet_name):
     """
     ss_client = smartsheet.Smartsheet()
     ss_client.errors_as_exceptions(True)
-    print(f'Sheet to get: {sheet_name}')
-    search_result = ss_client.Search.search(sheet_name, scopes = 'sheetNames').results
+    print(f'Sheet to get: {name}')
+    search_result = ss_client.Search.search(name, scopes = 'sheetNames').results
     print(f'Found {len(search_result)} results.')
     #for r in range(len(search_result)):
     for i, r in enumerate(search_result):
-        if (search_result[i].text) == sheet_name:
-            sheet_id = next(result.object_id for result in search_result if result.object_type == 'sheet')
+        if (search_result[i].text) == name:
+            sheet_id = next(result.object_id for result in search_result \
+                if result.object_type == 'sheet')
             sheet = ss_client.Sheets.get_sheet(sheet_id)
             print(f'Using: {sheet.name}. ID is {sheet_id}')
             cols = ss_client.Sheets.get_columns(sheet_id)
             column_id = cols.data[0].id
             get_from_smartsheet(sheet, sheet_id, column_id)
+            r=str(r)
         else:
-            print(f'''No results found for "{sheet_name}".
+            print(f'''No results found for "{name}".
                    Did you use the exact name, and put it in quotes?''')
 
 
@@ -145,12 +147,11 @@ def make_fixtures_for_group(groups):
     """
     names = []
     fixture_rows = []
-    row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
+    #row = ['', '', '', '', 0, 0, 0, 24, 24, 0, 0, 0]
     widths = []
     label_coords, label_text = [], []
     group_num = 1
     for cable_id, zone in groups.items():
-        #fixtures_per_line = (cable_id, len(zone))
         #print(f'Creating {len(zone)} lil squareys for {cable_id}...')
         group_num += 3
         for i in range(len(zone)):
@@ -193,8 +194,7 @@ def make_bg(w, h, labels):
     #oversize the layout just a little:
     w = w + 200
     h = h + 200
-    if w < 750:
-        w = 750
+    w = max(w, 750)
     print(f'Layout is: {w}w x {h}h pixels.')
     bg_filename = f'{sheet_name}.jpg'
     # create solid white bg image, using coordinates of the last fixture as overall size:
