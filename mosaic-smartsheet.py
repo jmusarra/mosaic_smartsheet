@@ -174,7 +174,7 @@ def make_fixtures_for_group(groups):
         for z in zone:
             name = f'{cable_id} - {z}'
             names.append(name)
-            label_text.append(cable_id)
+            label_text.append(f'{cable_id} - {len(zone)} fixtures. Universe: ')
     labels = zip(remove_dupes(label_coords), remove_dupes(label_text))
     for i, row in enumerate(fixture_rows):
         fixture_rows[i][0] = names[i]
